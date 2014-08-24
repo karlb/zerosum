@@ -12,6 +12,11 @@ from zerosum.login import get_or_create_user
 app.secret_key = os.environ['OPENSHIFT_SECURE_TOKEN']
 
 
+@app.route("/")
+def index():
+    return render_template('index.html', user=current_user)
+
+
 @app.route("/user/")
 @login_required
 def home():
@@ -24,9 +29,8 @@ def home():
 
     user = current_user
 
-    return render_template('index.html',
+    return render_template('home.html',
                            user=user, owes=owes, balances=balances)
-    #return "Hello World!" + repr(rows)
 
 
 @app.route("/user/new_owe", methods=['POST'])
