@@ -1,89 +1,58 @@
-<!DOCTYPE html>
-{% autoescape true %}
+{% extends "base.html" %}
 
-{% macro show_table(rows) -%}
+{% block main %}
+Hi {{ user.nickname }}!
+
+<h3>Recent Activity</h3>
+
 <table class="table">
-    {% for row in rows %}
+    <thead>
+        <th>From/to</th>
+        <th>Subject</th>
+        <th style="text-align:right">Amount</th>
+        <th>Created</th>
+    </thead>
+    {% for owe in owes %}
     <tr>
-        {% for field in row %}
-        <td>{{ field }}</td>
-        {% endfor %}
+        <td>{{ owe.user_name }}</td>
+        <td>{{ owe.subject }}</td>
+        <td style="text-align:right" class="{{ owe.amount | plusminus }}">{{ owe.amount }} {{owe.currency }}</td>
+        <td>{{ owe.created | dt }}</td>
     </tr>
     {% endfor %}
 </table>
-{%- endmacro %}
 
-<html>
-	<head>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-		<link rel="stylesheet" href="/css/main.css">
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<h3>Current Balances</h3>
 
-        <style>
-            .plus {color: green}
-            .minus {color: darkred}
-        </style>
-	</head>
-	<body>
-        <div class="container">
-            Hi {{ user.nickname }}!
+<table class="table">
+    <thead>
+        <th>From/to</th>
+        <th style="text-align:right">Amount</th>
+    </thead>
+    {% for b in balances %}
+    <tr>
+        <td>{{ b.user_name }}</td>
+        <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
-            <h3>Recent Activity</h3>
+<h3>New Owe</h3>
 
-            <table class="table">
-                <thead>
-                    <th>From/to</th>
-                    <th>Subject</th>
-                    <th style="text-align:right">Amount</th>
-                    <th>Created</th>
-                </thead>
-                {% for owe in owes %}
-                <tr>
-                    <td>{{ owe.user_name }}</td>
-                    <td>{{ owe.subject }}</td>
-                    <td style="text-align:right" class="{{ owe.amount | plusminus }}">{{ owe.amount }} {{owe.currency }}</td>
-                    <td>{{ owe.created | dt }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-
-            <h3>Current Balances</h3>
-
-            <table class="table">
-                <thead>
-                    <th>From/to</th>
-                    <th style="text-align:right">Amount</th>
-                </thead>
-                {% for b in balances %}
-                <tr>
-                    <td>{{ b.user_name }}</td>
-                    <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-
-            <h3>New Owe</h3>
-
-            <form role="form" class="form-inline" method="POST" action="new_owe">
-                I owe
-                <input name="amount" type="number" step="0.01" min="0" placeholder="1.00"
-                    class="form-control" style="width: 100px"/> &euro;
-                <input name="currency" type="hidden" value="EUR">
-                to
-                <input name="creditor" type="email" class="form-control" list="emails" placeholder="friend@example.com"
-                    style="width:250px">
-                <datalist id="emails">
-                    <option value="karl42@gmail.com">
-                    <option value="maria.schuldt89@gmail.com">
-                </datalist>
-                for
-                <input name="subject" class="form-control" placeholder="subject" style="width:250px">
-                <button type="submit" class="btn btn-primary">Confirm</button>
-            </form>
-        </div><!-- /.container -->
-	</body>
-</html>
-{% endautoescape %}
-
+<form role="form" class="form-inline" method="POST" action="new_owe">
+    I owe
+    <input name="amount" type="number" step="0.01" min="0" placeholder="1.00"
+        class="form-control" style="width: 100px"/> &euro;
+    <input name="currency" type="hidden" value="EUR">
+    to
+    <input name="creditor" type="email" class="form-control" list="emails" placeholder="friend@example.com"
+        style="width:250px">
+    <datalist id="emails">
+        <option value="karl42@gmail.com">
+        <option value="maria.schuldt89@gmail.com">
+    </datalist>
+    for
+    <input name="subject" class="form-control" placeholder="subject" style="width:250px">
+    <button type="submit" class="btn btn-primary">Confirm</button>
+</form>
+{% endblock %}

@@ -7,7 +7,7 @@ from flask.ext.login import current_user, login_required
 app = Flask(__name__.split('.')[0])
 
 import zerosum.db as db
-import zerosum.login
+from zerosum.login import get_or_create_user
 
 app.secret_key = os.environ['OPENSHIFT_SECURE_TOKEN']
 
@@ -38,17 +38,7 @@ def new_owe():
     amount = Decimal(request.form['amount'])
     subject = request.form['subject']
 
-    cur.execute("SELECT * FROM zerosum_user WHERE email = %s",
-                [creditor_email])
-    rows = cur.fetchall()
-    if not rows:
-        cur.execute("""
-            INSERT INTO zerosum_user(email, name) VALUES (%(email)s, %(email)s)
-            RETURNING user_id""",
-                    dict(email=creditor_email))
-        creditor_id = cur.fetchall()[0].user_id
-    else:
-        creditor_id = rows[0].user_id
+    creditor_id = get_or_create_user(creditor_email).user_id
 
     #cur.execute("SELECT create_owe(%s, %s, %s)")
     cur.execute("""INSERT INTO owe(creditor_id, debitor_id, amount, subject)

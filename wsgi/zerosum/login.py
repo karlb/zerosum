@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request, render_template
+from flask import redirect, url_for, request, render_template, flash
 from flask.ext.login import LoginManager, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -30,9 +30,10 @@ class User:
         self.password_hash = generate_password_hash(password)
         cur = get_db().cursor()
         cur.execute("""
-            UPDATE zerosum_user SET password_hash = %s
+            UPDATE zerosum_user SET password_hash = %s, is_active = true
             WHERE user_id = %s
         """, [self.password_hash, self.user_id])
+        assert cur.rowcount == 1
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -50,6 +51,21 @@ class User:
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+
+def get_or_create_user(email):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM zerosum_user WHERE email = %s",
+                [email])
+    rows = cur.fetchall()
+    if not rows:
+        cur.execute("""
+            INSERT INTO zerosum_user(email, name) VALUES (%(email)s, %(email)s)
+            RETURNING *""",
+                    dict(email=email))
+        rows = cur.fetchall()
+    return rows[0]
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -73,18 +89,47 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route("/email_confirm/<string:code>")
+class FormError(Exception):
+
+    def __init__(self, message):
+        self.message = message
+
+
+@app.route("/email_confirm/<string:code>", methods=['GET', 'POST'])
 def email_confirm(code):
     conn = get_db()
     cur = conn.cursor()
-
     cur.execute("""
-            SELECT *
-            FROM zerosum_user
-            WHERE email = (
-                SELECT email FROM email_confirm WHERE code = %s
-            )
+        UPDATE email_confirm
+        SET opened = current_timestamp
+        WHERE code = %s
+        RETURNING email
         """, [code])
-    user = User(cur.fetchall()[0])
-    login_user(user)
-    return redirect(url_for('home'))
+    email = cur.fetchall()[0].email
+
+    if request.method == 'POST':
+        try:
+            if email != request.form['email']:
+                raise FormError('Invalid Email')
+            if request.form['password'] != request.form['password2']:
+                raise FormError('Passwords do not match')
+            user = User(get_or_create_user(email))
+            user.set_password(request.form['password'])
+
+            login_user(user)
+            flash('Created new user!', 'success')
+            return redirect(url_for('home'))
+        except FormError as e:
+            flash(e.message, 'error')
+
+    #cur.execute("""
+    #        SELECT *
+    #        FROM zerosum_user
+    #        WHERE email = (
+    #            SELECT email FROM email_confirm WHERE code = %s
+    #        )
+    #    """, [code])
+    return render_template('register.html', email=email)
+    #user = User(cur.fetchall()[0])
+    #login_user(user)
+    #return redirect(url_for('home'))
