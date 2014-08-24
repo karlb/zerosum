@@ -2,7 +2,7 @@ import os
 from decimal import Decimal
 
 from flask import Flask, render_template, redirect, request, url_for
-from flask.ext.login import current_user, login_required
+from flask.ext.login import login_required, current_user
 
 app = Flask(__name__.split('.')[0])
 
@@ -14,7 +14,7 @@ app.secret_key = os.environ['OPENSHIFT_SECURE_TOKEN']
 
 @app.route("/")
 def index():
-    return render_template('index.html', user=current_user)
+    return render_template('index.html')
 
 
 @app.route("/user/")
@@ -27,10 +27,7 @@ def home():
     cur.execute("SELECT * FROM balances(%s)", [current_user.get_id()])
     balances = cur.fetchall()
 
-    user = current_user
-
-    return render_template('home.html',
-                           user=user, owes=owes, balances=balances)
+    return render_template('home.html', owes=owes, balances=balances)
 
 
 @app.route("/user/new_owe", methods=['POST'])

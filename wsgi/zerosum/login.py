@@ -1,5 +1,6 @@
 from flask import redirect, url_for, request, render_template, flash
-from flask.ext.login import LoginManager, login_user, logout_user
+from flask.ext.login import (LoginManager, login_user, logout_user,
+                             current_user)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from zerosum import app
@@ -51,6 +52,12 @@ class User:
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+
+# always add current_user to template variables
+@app.context_processor
+def inject_user():
+    return dict(user=current_user)
 
 
 def get_or_create_user(email):
