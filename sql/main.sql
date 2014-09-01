@@ -1,6 +1,6 @@
 DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
-CREATE EXTENSION "uuid-ossp";
+--CREATE EXTENSION "uuid-ossp";
 
 
 CREATE TABLE zerosum_user (
@@ -35,14 +35,21 @@ INSERT INTO owe(creditor_id, debitor_id, amount, subject) VALUES
 ;
 
 
+CREATE OR REPLACE FUNCTION gen_uuid()
+RETURNS uuid AS $$
+  SELECT uuid_in(md5(random()::text || now()::text)::cstring);
+$$ LANGUAGE sql;
+
+
 CREATE TABLE email_confirm (
-    code uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    --code uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    code uuid DEFAULT gen_uuid() PRIMARY KEY,
     email text NOT NULL,
     created timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
     opened timestamp
 );
 
-INSERT INTO email_confirm(email) VALUES ('u3@example.com');
+INSERT INTO email_confirm(email, code) VALUES ('u3@example.com', '123e4567-e89b-12d3-a456-426655440000');
 
 
 CREATE OR REPLACE FUNCTION recent_owes(current_user_id bigint)
