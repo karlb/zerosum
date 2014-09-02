@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block main %}
-<h3>Recent Activity</h3>
+<!--h3>Recent Activity</h3>
 
 <table class="table">
     <thead>
@@ -18,19 +18,26 @@
         <td>{{ owe.created | dt }}</td>
     </tr>
     {% endfor %}
-</table>
+</table-->
 
 <h3>Current Balances</h3>
 
 <table class="table">
     <thead>
         <th>From/to</th>
-        <th style="text-align:right">Amount</th>
+        <th style="text-align:right">Balance</th>
+        <th>Items</th>
     </thead>
     {% for b in balances %}
     <tr>
         <td>{{ b.user_name }}</td>
         <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
+        <td>
+            {% for d in details[b.user_id] %}
+                <span class="{{ d.amount | plusminus }} badge new">{{ d.subject }} {{ d.amount }}</span>
+                {%- if not loop.last %} &mdash; {% endif %}
+            {% endfor %}
+        </td>
     </tr>
     {% endfor %}
 </table>
