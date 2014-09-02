@@ -22,11 +22,12 @@
 
 <h3>Current Balances</h3>
 
-<table class="table">
+<table class="table balance">
     <thead>
-        <th>From/to</th>
+        <th>User</th>
         <th style="text-align:right">Balance</th>
         <th>Items</th>
+        <th>Latest</th>
     </thead>
     {% for b in balances %}
     <tr>
@@ -34,9 +35,11 @@
         <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
         <td>
             {% for d in details[b.user_id] %}
-                <span class="{{ d.amount | plusminus }} badge new">{{ d.subject }} {{ d.amount }}</span>
-                {%- if not loop.last %} &mdash; {% endif %}
+                <span class="{{ d.amount | plusminus }} badge {% if d.is_new %}new{% endif %}">{{ d.subject }} {{ d.amount }}</span>
             {% endfor %}
+        </td>
+        <td>
+            {{ b.latest | dt }}
         </td>
     </tr>
     {% endfor %}
@@ -47,11 +50,11 @@
 <form role="form" class="form-inline" method="POST" action="new_owe">
     I owe
     <input name="amount" type="number" step="0.01" min="0" placeholder="1.00"
-        class="form-control" style="width: 100px"/> &euro;
+        class="form-control" style="width: 100px" required/> &euro;
     <input name="currency" type="hidden" value="EUR">
     to
     <input name="creditor" type="email" class="form-control" list="emails" placeholder="friend@example.com"
-        style="width:250px">
+        style="width:250px" required>
     <datalist id="emails">
         <option value="karl42@gmail.com">
         <option value="maria.schuldt89@gmail.com">

@@ -37,6 +37,7 @@ def home():
 @app.route("/user/new_owe", methods=['POST'])
 def new_owe():
     creditor_email = request.form['creditor']
+    print(repr(request.form['amount']))
     amount = Decimal(request.form['amount'])
     subject = request.form['subject']
 

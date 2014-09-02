@@ -27,7 +27,8 @@
 
             .plus {color: green}
             .minus {color: darkred}
-            .badge.new {background-color: rgb(245, 245, 144)}
+            .table.balance .badge {background-color: rgb(233, 233, 233)}
+            .table.balance .badge.new {background-color: rgb(245, 245, 144)}
 
             .form-signin {
                 max-width: 330px;
@@ -75,7 +76,7 @@
                     </button>
                     <a class="navbar-brand" href="/">Zerosum</a>
                 </div>
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right navbar-collapse">
                     {% if user.is_authenticated() %}
                         <li><a href="/user">
                             <span class="glyphicon glyphicon-user"></span> {{ user.nickname }}
@@ -113,9 +114,9 @@
 
             <hr>
 
-            <footer>
+            <!--footer>
                 <p>&copy; Company 2014</p>
-            </footer>
+            </footer-->
         </div><!-- /.container -->
 
         <!-- Bootstrap core JavaScript

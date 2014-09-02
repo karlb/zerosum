@@ -59,7 +59,8 @@ RETURNS TABLE (
     amount decimal,
     subject text,
     created timestamp,
-    currency text
+    currency text,
+    is_new bool
 ) AS $$
     SELECT user_id,
         name,
@@ -69,7 +70,8 @@ RETURNS TABLE (
         END AS amount,
         subject,
         created,
-        currency
+        currency,
+        created > now() - INTERVAL '1 day' AS is_new
     FROM owe
         JOIN zerosum_user ON (
             (
@@ -89,12 +91,14 @@ RETURNS TABLE (
     user_id bigint,
     user_name text,
     amount decimal,
-    currency text
+    currency text,
+    latest timestamp
 ) AS $$
     SELECT user_id,
         user_name,
         sum(amount),
-        currency
+        currency,
+        max(created) AS latest
     FROM recent_owes(current_user_id)
     GROUP BY user_id, user_name, currency
 $$ LANGUAGE sql;
