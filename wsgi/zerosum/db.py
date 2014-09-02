@@ -19,6 +19,20 @@ def get_db():
     return g.db_conn
 
 
+def get_row(query, params):
+    cur = get_db().cursor()
+    cur.execute(query, params)
+    rows = cur.fetchall()
+    assert len(rows) == 1
+    return rows[0]
+
+
+def get_scalar(query, params):
+    row = get_row(query, params)
+    assert len(row) == 1
+    return row[0]
+
+
 @app.teardown_appcontext
 def close_db(error):
     """Closes the database again at the end of the request."""

@@ -6,8 +6,9 @@ from flask.ext.login import login_required, current_user
 
 app = Flask(__name__.split('.')[0])
 
-import zerosum.db as db
+from zerosum.db import get_db, get_scalar
 from zerosum.login import get_or_create_user
+from zerosum.mail import send_owe_mail
 
 app.secret_key = os.environ['OPENSHIFT_SECURE_TOKEN']
 
@@ -20,7 +21,7 @@ def index():
 @app.route("/user/")
 @login_required
 def home():
-    cur = db.get_db().cursor()
+    cur = get_db().cursor()
     cur.execute("SELECT * FROM recent_owes(%s)", [current_user.get_id()])
     owes = cur.fetchall()
 
@@ -32,20 +33,18 @@ def home():
 
 @app.route("/user/new_owe", methods=['POST'])
 def new_owe():
-    conn = db.get_db()
-    cur = conn.cursor()
-
     creditor_email = request.form['creditor']
     amount = Decimal(request.form['amount'])
     subject = request.form['subject']
 
     creditor_id = get_or_create_user(creditor_email).user_id
 
-    #cur.execute("SELECT create_owe(%s, %s, %s)")
-    cur.execute("""INSERT INTO owe(creditor_id, debitor_id, amount, subject)
-                   VALUES (%s, %s, %s, %s)""",
-                [creditor_id, current_user.get_id(), amount, subject])
-    conn.commit()
+    owe_id = get_scalar("""
+            INSERT INTO owe(creditor_id, debitor_id, amount, subject)
+            VALUES (%s, %s, %s, %s)
+            RETURNING owe_id
+        """, [creditor_id, current_user.get_id(), amount, subject])
+    send_owe_mail(owe_id)
     return redirect(url_for('home'))
 
 
