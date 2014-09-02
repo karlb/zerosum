@@ -28,6 +28,12 @@ $(function() {
     {% endfor %}
 </table-->
 
+{% macro owe_badge(owe, amount=True) %}
+<span class="{{ owe.amount | plusminus }} badge {% if owe.is_new %}new{% endif %}">
+    {{ owe.subject }} {{ owe.amount if amount }}
+</span>
+{% endmacro %}
+
 <h3>Current Balances</h3>
 
 <table class="table balance">
@@ -44,14 +50,14 @@ $(function() {
         <td class="details">
             <div class="summary">
                 {% for d in details[b.user_id] %}
-                    <span class="{{ d.amount | plusminus }} badge {% if d.is_new %}new{% endif %}">{{ d.subject }} {{ d.amount }}</span>
+                    {{ owe_badge(d) }}
                 {% endfor %}
             </div>
             <div class="list">
                 <table>
                 {% for d in details[b.user_id] %}
                     <tr>
-                        <td><span class="badge {{ d.amount | plusminus }}">{{ d.subject }}</span></td>
+                        <td>{{ owe_badge(d, amount=False) }}</td>
                         <td style="text-align:right" class="{{ d.amount | plusminus }}">{{ d.amount }} {{d.currency }}</td>
                         <td>{{ d.created | dt }}</td>
                     </tr>
@@ -64,6 +70,14 @@ $(function() {
         </td>
     </tr>
     {% endfor %}
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            <td colspan="3">
+                <span class="plus">{{ total[0] }}</span> / <span class="minus">{{ total[1] }}</span> EUR
+            </td>
+        </tr>
+    </tfoot>
 </table>
 
 <h3>New Owe</h3>

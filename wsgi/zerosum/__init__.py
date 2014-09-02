@@ -32,7 +32,12 @@ def home():
     cur.execute("SELECT user_id, array_to_json(array_agg(recent_owes)) FROM recent_owes(%s) GROUP BY 1", [current_user.get_id()])
     details = dict(cur.fetchall())
 
-    return render_template('home.html', owes=owes, balances=balances, details=details)
+    total = (
+        sum(b.amount for b in balances if b.amount > 0),
+        sum(b.amount for b in balances if b.amount < 0),
+    )
+
+    return render_template('home.html', owes=owes, balances=balances, details=details, total=total)
 
 
 @app.route("/user/new_owe", methods=['POST'])
