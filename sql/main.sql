@@ -52,10 +52,11 @@ CREATE TABLE email_confirm (
 INSERT INTO email_confirm(email, code) VALUES ('u3@example.com', '123e4567-e89b-12d3-a456-426655440000');
 
 
+DROP FUNCTION IF EXISTS recent_owes(current_user_id bigint);
 CREATE OR REPLACE FUNCTION recent_owes(current_user_id bigint)
 RETURNS TABLE (
     user_id bigint,
-    user_name text,
+    usr json,
     amount decimal,
     subject text,
     created timestamp,
@@ -63,7 +64,7 @@ RETURNS TABLE (
     is_new bool
 ) AS $$
     SELECT user_id,
-        name,
+        row_to_json(zerosum_user),
         CASE
             WHEN creditor_id = current_user_id THEN amount
             ELSE -amount
@@ -86,21 +87,22 @@ RETURNS TABLE (
 $$ LANGUAGE sql;
 
 
+DROP FUNCTION IF EXISTS balances(current_user_id bigint);
 CREATE OR REPLACE FUNCTION balances(current_user_id bigint)
 RETURNS TABLE (
     user_id bigint,
-    user_name text,
+    usr json,
     amount decimal,
     currency text,
     latest timestamp
 ) AS $$
     SELECT user_id,
-        user_name,
+        usr::text::json,
         sum(amount),
         currency,
         max(created) AS latest
     FROM recent_owes(current_user_id)
-    GROUP BY user_id, user_name, currency
+    GROUP BY user_id, usr::text, currency
     ORDER BY latest DESC
 $$ LANGUAGE sql;
 

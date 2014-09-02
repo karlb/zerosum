@@ -45,7 +45,7 @@ $(function() {
     </thead>
     {% for b in balances %}
     <tr>
-        <td>{{ b.user_name }}</td>
+        <td>{{ b.usr.name }}</td>
         <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
         <td class="details">
             <div class="summary">
