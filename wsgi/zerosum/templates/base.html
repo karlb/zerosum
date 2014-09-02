@@ -29,6 +29,10 @@
             .minus {color: darkred}
             .table.balance .badge {background-color: rgb(233, 233, 233)}
             .table.balance .badge.new {background-color: rgb(245, 245, 144)}
+            .table.balance .details:hover {background-color: rgb(255, 255, 220); cursor: pointer}
+            .table.balance .details .list {display: none}
+            .table.balance .details .list table {width: 100%; border-collapse: collapse;}
+            .table.balance .details .list table td {padding: 1px 8px}
 
             .form-signin {
                 max-width: 330px;
@@ -124,5 +128,11 @@
         <!-- Placed at the end of the document so the pages load faster -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+        // <![CDATA[
+            {% block script %}
+            {% endblock %}
+        // ]]>
+        </script>
 	</body>
 </html>

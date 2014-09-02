@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+
+{% block script %}
+$(function() {
+    $('.balance .details').click(function () {console.log($(this).find('.list, .summary').toggle())}); 
+});
+{% endblock %}
+
+
 {% block main %}
 <!--h3>Recent Activity</h3>
 
@@ -33,10 +41,23 @@
     <tr>
         <td>{{ b.user_name }}</td>
         <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
-        <td>
-            {% for d in details[b.user_id] %}
-                <span class="{{ d.amount | plusminus }} badge {% if d.is_new %}new{% endif %}">{{ d.subject }} {{ d.amount }}</span>
-            {% endfor %}
+        <td class="details">
+            <div class="summary">
+                {% for d in details[b.user_id] %}
+                    <span class="{{ d.amount | plusminus }} badge {% if d.is_new %}new{% endif %}">{{ d.subject }} {{ d.amount }}</span>
+                {% endfor %}
+            </div>
+            <div class="list">
+                <table>
+                {% for d in details[b.user_id] %}
+                    <tr>
+                        <td><span class="badge {{ d.amount | plusminus }}">{{ d.subject }}</span></td>
+                        <td style="text-align:right" class="{{ d.amount | plusminus }}">{{ d.amount }} {{d.currency }}</td>
+                        <td>{{ d.created | dt }}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
         </td>
         <td>
             {{ b.latest | dt }}

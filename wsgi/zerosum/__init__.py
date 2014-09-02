@@ -1,5 +1,6 @@
 import os
 from decimal import Decimal
+from datetime import datetime
 
 from flask import Flask, render_template, redirect, request, url_for
 from flask.ext.login import login_required, current_user
@@ -57,6 +58,8 @@ import pytz
 
 @app.template_filter('dt')
 def format_dt(dt):
+    if isinstance(dt, str):
+        dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f" )
     tz = pytz.timezone('Europe/Berlin')
     dt_with_tz = dt.replace(tzinfo=pytz.timezone('UTC')).astimezone(tz)
     return dt_with_tz.strftime('%Y-%m-%d %H:%M')

@@ -101,6 +101,7 @@ RETURNS TABLE (
         max(created) AS latest
     FROM recent_owes(current_user_id)
     GROUP BY user_id, user_name, currency
+    ORDER BY latest DESC
 $$ LANGUAGE sql;
 
 
