@@ -4,7 +4,8 @@ from flask.ext.login import (LoginManager, login_user, logout_user,
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from zerosum import app
-from zerosum.db import get_db
+from zerosum.db import get_db, get_scalar
+from zerosum.forms import RegisterForm
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -63,7 +64,7 @@ def inject_user():
 def get_or_create_user(email):
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM zerosum_user WHERE email = %s",
+    cur.execute("SELECT * FROM zerosum_user WHERE email = %s FOR UPDATE",
                 [email])
     rows = cur.fetchall()
     if not rows:
@@ -104,39 +105,21 @@ class FormError(Exception):
 
 @app.route("/email_confirm/<string:code>", methods=['GET', 'POST'])
 def email_confirm(code):
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
+    email = get_scalar("""
         UPDATE email_confirm
         SET opened = current_timestamp
         WHERE code = %s
         RETURNING email
         """, [code])
-    email = cur.fetchall()[0].email
 
-    if request.method == 'POST':
-        try:
-            if email != request.form['email']:
-                raise FormError('Invalid Email')
-            if request.form['password'] != request.form['password2']:
-                raise FormError('Passwords do not match')
-            user = User(get_or_create_user(email))
-            user.set_password(request.form['password'])
-
-            login_user(user)
-            flash('Created new user!', 'success')
-            return redirect(url_for('home'))
-        except FormError as e:
-            flash(e.message, 'error')
-
-    #cur.execute("""
-    #        SELECT *
-    #        FROM zerosum_user
-    #        WHERE email = (
-    #            SELECT email FROM email_confirm WHERE code = %s
-    #        )
-    #    """, [code])
-    return render_template('register.html', email=email)
-    #user = User(cur.fetchall()[0])
-    #login_user(user)
-    #return redirect(url_for('home'))
+    form = RegisterForm(email=email)
+    form.email.kwargs = dict(readonly=True)
+    if form.validate_on_submit():
+        assert form.email.data == email
+        user = User(get_or_create_user(email))
+        user.set_password(request.form['password'])
+        login_user(user)
+        flash('Created new user!', 'success')
+        return redirect(url_for('home'))
+    else:
+        return render_template('register.html', form=form)

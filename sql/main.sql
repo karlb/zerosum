@@ -1,12 +1,13 @@
 DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
 --CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION citext;
 
 
 CREATE TABLE zerosum_user (
     user_id bigserial PRIMARY KEY,
     name text,
-    email text UNIQUE,
+    email citext UNIQUE,
     is_active bool DEFAULT false,
     password_hash text
 );
@@ -44,7 +45,7 @@ $$ LANGUAGE sql;
 CREATE TABLE email_confirm (
     --code uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     code uuid DEFAULT gen_uuid() PRIMARY KEY,
-    email text NOT NULL,
+    email citext NOT NULL,
     created timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
     opened timestamp
 );
