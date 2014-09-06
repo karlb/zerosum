@@ -11,7 +11,7 @@ from zerosum.db import get_db, get_scalar
 from zerosum.login import get_or_create_user
 from zerosum.mail import send_owe_mail
 
-app.secret_key = os.environ['OPENSHIFT_SECURE_TOKEN']
+app.secret_key = os.environ['OPENSHIFT_SECRET_TOKEN']
 
 
 @app.route("/")
