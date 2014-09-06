@@ -6,6 +6,16 @@ from flask import Flask, render_template, redirect, request, url_for
 from flask.ext.login import login_required, current_user
 
 app = Flask(__name__.split('.')[0])
+app.debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+if not app.debug:
+    import logging
+    from logging.handlers import RotatingFileHandler
+    file_handler = RotatingFileHandler(
+        os.environ['OPENSHIFT_LOG_DIR'] + '/flask.log',
+        maxBytes=10000, backupCount=1)
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    print('added log handler')
 
 from zerosum.db import get_db, get_scalar
 from zerosum.login import get_or_create_user
@@ -80,5 +90,4 @@ def format_plusminus(value):
 
 
 if __name__ == "__main__":
-    debug = bool(os.environ.get('FLASK_DEBUG', False))
-    app.run(debug=debug)
+    app.run()
