@@ -13,8 +13,10 @@ def get_db():
     """
     if not hasattr(g, 'db_conn'):
         g.db_conn = psycopg2.connect(
-            os.environ['OPENSHIFT_POSTGRESQL_DB_URL'],
-            cursor_factory=psycopg2.extras.NamedTupleCursor
+            database='zerosum',
+            user=os.environ.get('OPENSHIFT_POSTGRESQL_DB_USERNAME'),
+            password=os.environ.get('OPENSHIFT_POSTGRESQL_DB_PASSWORD'),
+            cursor_factory=psycopg2.extras.NamedTupleCursor,
         )
     return g.db_conn
 
