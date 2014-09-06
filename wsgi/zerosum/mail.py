@@ -21,11 +21,11 @@ def send_mail(template, to, **tmpl_vars):
     sg.send(message)
 
 
-def confirm_code(user):
+def confirm_code(email):
     return get_scalar("""
         INSERT INTO email_confirm(email) VALUES (%s)
         RETURNING code
-    """, [user.email])
+    """, [email])
 
 
 def send_owe_mail(owe_id):
@@ -41,4 +41,4 @@ def send_owe_mail(owe_id):
             WHERE owe_id = %s
         """, [owe_id])
     send_mail('mails/new_owe.txt', owe.creditor_email,
-              confirm_code=confirm_code, **owe._asdict())
+            confirm_code=lambda: confirm_code(owe.creditor_email), **owe._asdict())
