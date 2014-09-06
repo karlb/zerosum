@@ -5,7 +5,7 @@ Hi {{ creditor_name }}!
 {{ debitor_name }} just saved that he/she owes you {{ amount }} {{ currency }} for "{{ subject }}".
 
 {% if is_active -%}
-Have a look at our Zerosum account to see the details: {{ url_for('home', _external=True) }}
+Have a look at our {{ app_name }} account to see the details: {{ url_for('home', _external=True) }}
 {%- else -%}
-This information is stored on Zerosum, an online owe tracking service. Go to {{ url_for('email_confirm', code=confirm_code(), _external=True) }} to claim your account, see all details about your owes and create new ones.
+This information is stored on {{ app_name }}, an online owe tracking service. Go to {{ url_for('email_confirm', code=confirm_code(), _external=True) }} to claim your account, see all details about your owes and create new ones.
 {%- endif %}

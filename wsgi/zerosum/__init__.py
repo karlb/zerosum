@@ -88,6 +88,10 @@ def format_plusminus(value):
     else:
         return ''
 
+@app.context_processor
+def inject_user():
+    return dict(app_name='TrackMyOwe')
+
 
 if __name__ == "__main__":
     app.run()
