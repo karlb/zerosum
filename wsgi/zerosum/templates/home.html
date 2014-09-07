@@ -28,9 +28,9 @@ $(function() {
     {% endfor %}
 </table-->
 
-{% macro owe_badge(owe, amount=True) %}
+{% macro owe_badge(owe, amount=True, length=30) %}
 <span class="{{ owe.amount | plusminus }} badge {% if owe.is_new %}new{% endif %}">
-    {{ owe.subject }} {{ owe.amount if amount }}
+    {{ owe.subject | truncate(length) }} {{ owe.amount if amount }}
 </span>
 {% endmacro %}
 
@@ -50,7 +50,7 @@ $(function() {
         <td class="details">
             <div class="summary">
                 {% for d in details[b.user_id] %}
-                    {{ owe_badge(d) }}
+                    {{ owe_badge(d, length=14) }}
                 {% endfor %}
             </div>
             <div class="list">
