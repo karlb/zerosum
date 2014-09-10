@@ -3,6 +3,7 @@ import os
 from flask import render_template
 import sendgrid
 
+from zerosum import app
 from zerosum.db import get_row, get_scalar
 
 sg = sendgrid.SendGridClient(os.environ['SENDGRID_USER'],
@@ -12,6 +13,9 @@ sg = sendgrid.SendGridClient(os.environ['SENDGRID_USER'],
 
 def send_mail(template, to, **tmpl_vars):
     rendered_tmpl = render_template(template, **tmpl_vars)
+    if app.debug:
+        app.logger.debug(rendered_tmpl)
+        return
     subject, separator, body = rendered_tmpl.partition('\n--\n')
     message = sendgrid.Mail(
         to=to,
