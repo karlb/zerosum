@@ -21,6 +21,12 @@ def get_db():
     return g.db_conn
 
 
+def get_all(query, params):
+    cur = get_db().cursor()
+    cur.execute(query, params)
+    return cur.fetchall()
+
+
 def get_row(query, params):
     cur = get_db().cursor()
     cur.execute(query, params)

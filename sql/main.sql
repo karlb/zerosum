@@ -36,6 +36,18 @@ INSERT INTO owe(creditor_id, debitor_id, amount, subject) VALUES
 ;
 
 
+CREATE TABLE owe_request (
+    owe_request_id bigserial PRIMARY KEY,
+    creditor_id bigint REFERENCES zerosum_user(user_id) NOT NULL,
+    debitor_id bigint REFERENCES zerosum_user(user_id) NOT NULL,
+    amount decimal NOT NULL CHECK (amount > 0),
+    subject text,
+    created timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
+    currency text NOT NULL DEFAULT 'EUR',
+    status text DEFAULT 'open' CHECK (status IN ('open', 'accepted', 'rejected'))
+);
+
+
 CREATE OR REPLACE FUNCTION gen_uuid()
 RETURNS uuid AS $$
   SELECT uuid_in(md5(random()::text || now()::text)::cstring);
@@ -51,3 +63,5 @@ CREATE TABLE email_confirm (
 );
 
 INSERT INTO email_confirm(email, code) VALUES ('u3@example.com', '123e4567-e89b-12d3-a456-426655440000');
+
+\i sql/functions.sql

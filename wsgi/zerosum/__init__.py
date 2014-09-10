@@ -2,7 +2,7 @@ import os
 from decimal import Decimal
 from datetime import datetime
 
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, flash
 from flask.ext.login import login_required, current_user
 
 app = Flask(__name__.split('.')[0])
@@ -17,7 +17,7 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     print('added log handler')
 
-from zerosum.db import get_db, get_scalar
+from zerosum.db import get_db, get_scalar, get_all
 from zerosum.login import get_or_create_user
 from zerosum.mail import send_owe_mail
 from zerosum import forms
@@ -40,15 +40,27 @@ def home():
     cur.execute("SELECT * FROM balances(%s)", [current_user.get_id()])
     balances = cur.fetchall()
 
-    cur.execute("SELECT user_id, array_to_json(array_agg(recent_owes)) FROM recent_owes(%s) GROUP BY 1", [current_user.get_id()])
+    cur.execute("""
+        SELECT user_id, array_to_json(array_agg(recent_owes))
+        FROM recent_owes(%s) GROUP BY 1
+    """, [current_user.get_id()])
     details = dict(cur.fetchall())
+
+    requests = get_all("""
+        SELECT owe_request.*, name
+        FROM owe_request
+             JOIN zerosum_user ON (creditor_id = user_id)
+        WHERE debitor_id = %s
+        ORDER BY created
+    """, [current_user.get_id()])
 
     total = (
         sum(b.amount for b in balances if b.amount > 0),
         sum(b.amount for b in balances if b.amount < 0),
     )
 
-    return render_template('home.html', owes=owes, balances=balances, details=details, total=total)
+    return render_template('home.html', owes=owes, balances=balances,
+                           details=details, total=total, requests=requests)
 
 
 @app.route("/user/new_owe", methods=['POST'])
@@ -81,9 +93,29 @@ def new_owe():
             """, [creditor_id, current_user.get_id(),
                   form.amount.data, form.subject.data])
         send_owe_mail(owe_id)
+        flash('Successfully added owe!', 'success')
         return redirect(url_for('home'))
     else:
         return render_template('new_owe.html', form=form)
+
+
+@app.route("/request_owe", methods=['GET', 'POST'])
+def request_owe():
+    form = forms.RequestOweForm()
+    form.debitor.kwargs = dict(autofocus=True)
+    if form.validate_on_submit():
+        debitor_id = get_or_create_user(form.debitor.data).user_id
+        owe_id = get_scalar("""
+                INSERT INTO owe_request(creditor_id, debitor_id, amount, subject)
+                VALUES (%s, %s, %s, %s)
+                RETURNING owe_request_id
+            """, [current_user.get_id(), debitor_id,
+                  form.amount.data, form.subject.data])
+        #send_owe_request_mail(owe_request_id)
+        flash('Owe request sent successfully!', 'success')
+        return redirect(url_for('home'))
+    else:
+        return render_template('request_owe.html', form=form)
 
 
 import pytz

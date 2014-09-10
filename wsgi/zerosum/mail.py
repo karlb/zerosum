@@ -6,8 +6,8 @@ import sendgrid
 from zerosum import app
 from zerosum.db import get_row, get_scalar
 
-sg = sendgrid.SendGridClient(os.environ['SENDGRID_USER'],
-                             os.environ['SENDGRID_PASSWORD'],
+sg = sendgrid.SendGridClient(os.environ.get('SENDGRID_USER'),
+                             os.environ.get('SENDGRID_PASSWORD'),
                              raise_errors=True)
 
 

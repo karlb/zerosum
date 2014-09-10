@@ -27,3 +27,9 @@ class NewOweForm(Form):
     creditor = StringField('I owe to', validators=[DataRequired(), Email()])
     amount = DecimalField('Amount', validators=[DataRequired()])
     subject = StringField('Subject')
+
+
+class RequestOweForm(Form):
+    debitor = StringField('Who owes me?', validators=[DataRequired(), Email()])
+    amount = DecimalField('Amount', validators=[DataRequired()])
+    subject = StringField('Subject')

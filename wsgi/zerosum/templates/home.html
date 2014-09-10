@@ -38,6 +38,17 @@ $(function() {
 {% endif %}
 {% endmacro %}
 
+{% for r in requests %}
+    <div class="alert alert-info row">
+        <div class="col-sm-8">
+            {{ r.name }} says you owe him/her {{ r.amount }} {{ r.currency }}
+            {% if r.subject %}for "{{ r.subject }}"{% endif %}
+        </div>
+        <a href="" class="col-sm-2 btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span> Confirm Owe</a>
+        <a href="" class="col-sm-2 btn btn-sm btn-warning"><span class="glyphicon glyphicon-remove"></span> Reject Owe</a>
+    </div>
+{% endfor %}
+
 <h3>Current Balances</h3>
 
 <table class="table balance">
@@ -88,13 +99,13 @@ $(function() {
 
 <div class="actions">
     <div class="row">
-        <a href="/new_owe" class="btn btn-success col-sm-2"><span class="glyphicon glyphicon-plus"></span> New Owe</a>
+        <a href="/new_owe" class="btn btn-primary col-sm-2"><span class="glyphicon glyphicon-plus"></span> New Owe</a>
         <div class="col-sm-10 text">
             Track that you owe someone and let him/her know.
         </div>
     </div>
     <div class="row">
-        <a href="" class="btn btn-success col-sm-2 disabled"><span class="glyphicon glyphicon-plus"></span> Request Owe</a>
+        <a href="{{ url_for('request_owe') }}" class="btn btn-primary col-sm-2"><span class="glyphicon glyphicon-plus"></span> Request Owe</a>
         <div class="col-sm-10 text">
             Someone owes you money? Remind them to add it!
         </div>
