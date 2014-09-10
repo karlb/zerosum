@@ -29,9 +29,13 @@ $(function() {
 </table-->
 
 {% macro owe_badge(owe, amount=True, length=30) %}
-<span class="{{ owe.amount | plusminus }} badge {% if owe.is_new %}new{% endif %}">
-    {{ owe.subject | truncate(length) }} {{ owe.amount if amount }}
-</span>
+{% if owe.subject or amount %}
+    <span class="{{ owe.amount | plusminus }} badge {% if owe.is_new %}new{% endif %}">
+        {{ owe.subject | truncate(length) }} {{ owe.amount if amount }}
+    </span>
+{% else %}
+    <span class="text-muted">no subject</span>
+{% endif %}
 {% endmacro %}
 
 <h3>Current Balances</h3>

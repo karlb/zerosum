@@ -20,6 +20,7 @@ if not app.debug:
 from zerosum.db import get_db, get_scalar
 from zerosum.login import get_or_create_user
 from zerosum.mail import send_owe_mail
+from zerosum import forms
 
 app.secret_key = os.environ['OPENSHIFT_SECRET_TOKEN']
 
@@ -51,7 +52,7 @@ def home():
 
 
 @app.route("/user/new_owe", methods=['POST'])
-def new_owe():
+def new_owe_old():
     creditor_email = request.form['creditor']
     amount = Decimal(request.form['amount'])
     subject = request.form['subject']
@@ -67,13 +68,31 @@ def new_owe():
     return redirect(url_for('home'))
 
 
+@app.route("/new_owe", methods=['GET', 'POST'])
+def new_owe():
+    form = forms.NewOweForm()
+    form.creditor.kwargs = dict(autofocus=True)
+    if form.validate_on_submit():
+        creditor_id = get_or_create_user(form.creditor.data).user_id
+        owe_id = get_scalar("""
+                INSERT INTO owe(creditor_id, debitor_id, amount, subject)
+                VALUES (%s, %s, %s, %s)
+                RETURNING owe_id
+            """, [creditor_id, current_user.get_id(),
+                  form.amount.data, form.subject.data])
+        send_owe_mail(owe_id)
+        return redirect(url_for('home'))
+    else:
+        return render_template('new_owe.html', form=form)
+
+
 import pytz
 
 
 @app.template_filter('dt')
 def format_dt(dt):
     if isinstance(dt, str):
-        dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f" )
+        dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f")
     tz = pytz.timezone('Europe/Berlin')
     dt_with_tz = dt.replace(tzinfo=pytz.timezone('UTC')).astimezone(tz)
     return dt_with_tz.strftime('%Y-%m-%d %H:%M')
@@ -87,6 +106,7 @@ def format_plusminus(value):
         return 'plus'
     else:
         return ''
+
 
 @app.context_processor
 def inject_user():
