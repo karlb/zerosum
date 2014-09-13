@@ -31,7 +31,7 @@ $(function() {
 {% macro owe_badge(owe, amount=True, length=30) %}
 {% if owe.subject or amount %}
     <span class="{{ owe.amount | plusminus }} badge {% if owe.is_new %}new{% endif %}">
-        {{ owe.subject | truncate(length) }} {{ owe.amount if amount }}
+        {{ owe.subject | truncate(length) }} {{ owe.amount | money if amount }}
     </span>
 {% else %}
     <span class="text-muted">no subject</span>
@@ -42,7 +42,7 @@ $(function() {
     <div class="alert alert-info">
         <div class="clearfix">
             <div class="col-sm-8">
-                {{ r.name }} says you owe him/her {{ r.amount }} {{ r.currency }}
+                {{ r.name }} says you owe him/her {{ r.amount | money }} {{ r.currency }}
                 {% if r.subject %}for "{{ r.subject }}"{% endif %}
             </div>
             <form action="{{ url_for('respond_to_request') }}" method="POST">
@@ -66,7 +66,7 @@ $(function() {
     {% for b in balances %}
     <tr>
         <td>{{ b.usr.name }}</td>
-        <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount }} {{ b.currency }}</td>
+        <td style="text-align:right" class="{{ b.amount | plusminus }}">{{ b.amount | money }} {{ b.currency }}</td>
         <td class="details">
             <div class="summary">
                 {% for d in details[b.user_id] %}
@@ -78,7 +78,7 @@ $(function() {
                 {% for d in details[b.user_id] %}
                     <tr>
                         <td>{{ owe_badge(d, amount=False) }}</td>
-                        <td style="text-align:right" class="{{ d.amount | plusminus }}">{{ d.amount }} {{d.currency }}</td>
+                        <td style="text-align:right" class="{{ d.amount | plusminus }}">{{ d.amount | money }} {{d.currency }}</td>
                         <td>{{ d.created | dt }}</td>
                     </tr>
                 {% endfor %}
@@ -94,7 +94,7 @@ $(function() {
         <tr>
             <th>Total</th>
             <td colspan="3">
-                <span class="plus">{{ total[0] }}</span> / <span class="minus">{{ total[1] }}</span> EUR
+                <span class="plus">{{ total[0] | money }}</span> / <span class="minus">{{ total[1] | money }}</span> EUR
             </td>
         </tr>
     </tfoot>

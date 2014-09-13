@@ -1,6 +1,5 @@
 import os
 from decimal import Decimal
-from datetime import datetime
 
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask.ext.login import login_required, current_user
@@ -19,6 +18,7 @@ if not app.debug:
 
 from zerosum.db import get_db, get_scalar, get_all
 import zerosum.owe
+import zerosum.template_helpers
 
 app.secret_key = os.environ['OPENSHIFT_SECRET_TOKEN']
 
@@ -60,33 +60,6 @@ def home():
 
     return render_template('home.html', owes=owes, balances=balances,
                            details=details, total=total, requests=requests)
-
-
-import pytz
-
-
-@app.template_filter('dt')
-def format_dt(dt):
-    if isinstance(dt, str):
-        dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f")
-    tz = pytz.timezone('Europe/Berlin')
-    dt_with_tz = dt.replace(tzinfo=pytz.timezone('UTC')).astimezone(tz)
-    return dt_with_tz.strftime('%Y-%m-%d %H:%M')
-
-
-@app.template_filter('plusminus')
-def format_plusminus(value):
-    if value < 0:
-        return 'minus'
-    if value > 0:
-        return 'plus'
-    else:
-        return ''
-
-
-@app.context_processor
-def inject_user():
-    return dict(app_name='TrackMyOwe')
 
 
 if __name__ == "__main__":
