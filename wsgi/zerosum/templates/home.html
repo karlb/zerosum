@@ -39,13 +39,18 @@ $(function() {
 {% endmacro %}
 
 {% for r in requests %}
-    <div class="alert alert-info row">
-        <div class="col-sm-8">
-            {{ r.name }} says you owe him/her {{ r.amount }} {{ r.currency }}
-            {% if r.subject %}for "{{ r.subject }}"{% endif %}
+    <div class="alert alert-info">
+        <div class="clearfix">
+            <div class="col-sm-8">
+                {{ r.name }} says you owe him/her {{ r.amount }} {{ r.currency }}
+                {% if r.subject %}for "{{ r.subject }}"{% endif %}
+            </div>
+            <form action="{{ url_for('respond_to_request') }}" method="POST">
+                <input type="hidden" name="request_id" value="{{ r.owe_request_id}}">
+                <button name="action" value="confirm" class="col-sm-2 btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span> Confirm Owe</button>
+                <button name="action" value="reject" class="col-sm-2 btn btn-sm btn-warning"><span class="glyphicon glyphicon-remove"></span> Reject Owe</button>
+            </form>
         </div>
-        <a href="" class="col-sm-2 btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span> Confirm Owe</a>
-        <a href="" class="col-sm-2 btn btn-sm btn-warning"><span class="glyphicon glyphicon-remove"></span> Reject Owe</a>
     </div>
 {% endfor %}
 

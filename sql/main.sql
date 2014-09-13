@@ -42,9 +42,11 @@ CREATE TABLE owe_request (
     debitor_id bigint REFERENCES zerosum_user(user_id) NOT NULL,
     amount decimal NOT NULL CHECK (amount > 0),
     subject text,
-    created timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
+    created_at timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
     currency text NOT NULL DEFAULT 'EUR',
-    status text DEFAULT 'open' CHECK (status IN ('open', 'accepted', 'rejected'))
+    status text DEFAULT 'open' CHECK (status IN ('open', 'accepted', 'rejected')),
+    responded_at timestamp,
+    owe_id bigint REFERENCES owe(owe_id)
 );
 
 

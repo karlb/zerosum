@@ -18,9 +18,7 @@ if not app.debug:
     print('added log handler')
 
 from zerosum.db import get_db, get_scalar, get_all
-from zerosum.login import get_or_create_user
-from zerosum.mail import send_owe_mail
-from zerosum import forms
+import zerosum.owe
 
 app.secret_key = os.environ['OPENSHIFT_SECRET_TOKEN']
 
@@ -30,8 +28,8 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/user/")
 @login_required
+@app.route("/user/")
 def home():
     cur = get_db().cursor()
     cur.execute("SELECT * FROM recent_owes(%s)", [current_user.get_id()])
@@ -51,7 +49,8 @@ def home():
         FROM owe_request
              JOIN zerosum_user ON (creditor_id = user_id)
         WHERE debitor_id = %s
-        ORDER BY created
+          AND status = 'open'
+        ORDER BY created_at
     """, [current_user.get_id()])
 
     total = (
@@ -61,61 +60,6 @@ def home():
 
     return render_template('home.html', owes=owes, balances=balances,
                            details=details, total=total, requests=requests)
-
-
-@app.route("/user/new_owe", methods=['POST'])
-def new_owe_old():
-    creditor_email = request.form['creditor']
-    amount = Decimal(request.form['amount'])
-    subject = request.form['subject']
-
-    creditor_id = get_or_create_user(creditor_email).user_id
-
-    owe_id = get_scalar("""
-            INSERT INTO owe(creditor_id, debitor_id, amount, subject)
-            VALUES (%s, %s, %s, %s)
-            RETURNING owe_id
-        """, [creditor_id, current_user.get_id(), amount, subject])
-    send_owe_mail(owe_id)
-    return redirect(url_for('home'))
-
-
-@app.route("/new_owe", methods=['GET', 'POST'])
-def new_owe():
-    form = forms.NewOweForm()
-    form.creditor.kwargs = dict(autofocus=True)
-    if form.validate_on_submit():
-        creditor_id = get_or_create_user(form.creditor.data).user_id
-        owe_id = get_scalar("""
-                INSERT INTO owe(creditor_id, debitor_id, amount, subject)
-                VALUES (%s, %s, %s, %s)
-                RETURNING owe_id
-            """, [creditor_id, current_user.get_id(),
-                  form.amount.data, form.subject.data])
-        send_owe_mail(owe_id)
-        flash('Successfully added owe!', 'success')
-        return redirect(url_for('home'))
-    else:
-        return render_template('new_owe.html', form=form)
-
-
-@app.route("/request_owe", methods=['GET', 'POST'])
-def request_owe():
-    form = forms.RequestOweForm()
-    form.debitor.kwargs = dict(autofocus=True)
-    if form.validate_on_submit():
-        debitor_id = get_or_create_user(form.debitor.data).user_id
-        owe_id = get_scalar("""
-                INSERT INTO owe_request(creditor_id, debitor_id, amount, subject)
-                VALUES (%s, %s, %s, %s)
-                RETURNING owe_request_id
-            """, [current_user.get_id(), debitor_id,
-                  form.amount.data, form.subject.data])
-        #send_owe_request_mail(owe_request_id)
-        flash('Owe request sent successfully!', 'success')
-        return redirect(url_for('home'))
-    else:
-        return render_template('request_owe.html', form=form)
 
 
 import pytz
