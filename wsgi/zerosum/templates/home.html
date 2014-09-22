@@ -8,26 +8,6 @@ $(function() {
 {% endblock %}
 
 
-{% block main %}
-<!--h3>Recent Activity</h3>
-
-<table class="table">
-    <thead>
-        <th>From/to</th>
-        <th>Subject</th>
-        <th style="text-align:right">Amount</th>
-        <th>Created</th>
-    </thead>
-    {% for owe in owes %}
-    <tr>
-        <td>{{ owe.user_name }}</td>
-        <td>{{ owe.subject }}</td>
-        <td style="text-align:right" class="{{ owe.amount | plusminus }}">{{ owe.amount }} {{owe.currency }}</td>
-        <td>{{ owe.created | dt }}</td>
-    </tr>
-    {% endfor %}
-</table-->
-
 {% macro owe_badge(owe, amount=True, length=30) %}
 {% if owe.subject or amount %}
     <span class="{{ owe.amount | plusminus }} badge {% if owe.is_new %}new{% endif %}">
@@ -38,12 +18,20 @@ $(function() {
 {% endif %}
 {% endmacro %}
 
+
+{% macro owe_message(owe) %}
+	{{ owe.amount | money }} {{ owe.currency }}
+	{% if owe.subject %}for "{{ owe.subject }}"{% endif %}
+{% endmacro %}
+
+
+{% block main %}
+
 {% for r in requests %}
     <div class="alert alert-info">
         <div class="clearfix">
             <div class="col-sm-8">
-                {{ r.name }} says you owe him/her {{ r.amount | money }} {{ r.currency }}
-                {% if r.subject %}for "{{ r.subject }}"{% endif %}
+				{{ r.name }} says you owe him/her {{ owe_message(r) }}
             </div>
             <form action="{{ url_for('respond_to_request') }}" method="POST">
                 <input type="hidden" name="request_id" value="{{ r.owe_request_id}}">
@@ -127,7 +115,7 @@ $(function() {
 		<h3>Open Owe Requests</h3>
 		<ul>
 		{% for r in my_open_requests %}
-			<li>{{ r.name }} owes you {{ r.amount | money }} {{ r.currency }} for {{ r.subject }}</li>
+			<li>{{ r.name }} owes you {{ owe_message(r) }}</li>
 		{% endfor %}
 		</ul>
 	</div>
