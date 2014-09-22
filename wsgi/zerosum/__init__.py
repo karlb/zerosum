@@ -53,13 +53,23 @@ def home():
         ORDER BY created_at
     """, [current_user.get_id()])
 
+    my_open_requests = get_all("""
+        SELECT owe_request.*, name
+        FROM owe_request
+             JOIN zerosum_user ON (debitor_id = user_id)
+        WHERE creditor_id = %s
+          AND status = 'open'
+        ORDER BY created_at
+    """, [current_user.get_id()])
+
     total = (
         sum(b.amount for b in balances if b.amount > 0),
         sum(b.amount for b in balances if b.amount < 0),
     )
 
     return render_template('home.html', owes=owes, balances=balances,
-                           details=details, total=total, requests=requests)
+                           details=details, total=total, requests=requests,
+                           my_open_requests=my_open_requests)
 
 
 if __name__ == "__main__":
