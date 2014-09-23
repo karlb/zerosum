@@ -14,6 +14,10 @@ class RegisterForm(Form):
                               validators=[DataRequired(), EqualTo('password')])
 
 
+class RequestEmailVerificationForm(Form):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+
+
 class EmailWithName(Email):
 
     def process_formdata(self, valuelist):

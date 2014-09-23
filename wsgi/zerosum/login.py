@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from zerosum import app
 from zerosum.db import get_db, get_scalar
-from zerosum.forms import RegisterForm
+import zerosum.forms as forms
+from zerosum.mail import send_registration_mail
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -112,7 +113,7 @@ def email_confirm(code):
         RETURNING email
         """, [code])
 
-    form = RegisterForm(email=email)
+    form = forms.RegisterForm(email=email)
     form.email.kwargs = dict(readonly=True)
     if form.validate_on_submit():
         assert form.email.data == email
@@ -123,3 +124,15 @@ def email_confirm(code):
         return redirect(url_for('home'))
     else:
         return render_template('register.html', form=form)
+
+
+@app.route("/request_email_verification", methods=['GET', 'POST'])
+def request_email_verification():
+    form = forms.RequestEmailVerificationForm()
+    form.email.kwargs = dict(autofocus=True)
+    if form.validate_on_submit():
+        send_registration_mail(form.email.data)
+        flash('Verification email sent.', 'success')
+        return redirect(url_for('home'))
+    else:
+        return render_template('request_email_verification.html', form=form)

@@ -46,3 +46,8 @@ def send_owe_mail(owe_id):
         """, [owe_id])
     send_mail('mails/new_owe.txt', owe.creditor_email,
             confirm_code=lambda: confirm_code(owe.creditor_email), **owe._asdict())
+
+
+def send_registration_mail(email):
+    send_mail('mails/register.txt', email,
+            confirm_code=lambda: confirm_code(email))

@@ -5,7 +5,10 @@
         <div class="container">
             <h1>Track your owes</h1>
             <p>Your coworker paid for your lunch? A friend paid your cocktail? Don't forget about it and let them know that you remember!</p>
-            <p><a class="btn btn-primary btn-lg" role="button">Join now</a></p>
+            <p><a class="btn btn-primary btn-lg" role="button"
+                  href="{{ url_for('request_email_verification') }}">
+                Join now
+            </a></p>
         </div>
     </div>
 {% endblock %}
@@ -38,4 +41,26 @@
             </p>
         </div>
     </div>
+
+
+    <!--div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="" method="POST">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Join now!</h4>
+                    </div>
+                    <div class="modal-body">
+                        Before you can join {{ app_name }}, please verify your email address. This is necessary because your email address will be used to identify you to other users.
+                        <input type="email">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Send registration mail</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div-->
 {% endblock %}
