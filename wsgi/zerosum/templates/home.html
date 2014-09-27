@@ -67,7 +67,7 @@ $(function() {
                     <tr>
                         <td>{{ owe_badge(d, amount=False) }}</td>
                         <td style="text-align:right" class="{{ d.amount | plusminus }}">{{ d.amount | money }} {{d.currency }}</td>
-                        <td>{{ d.created | dt }}</td>
+                        <td>{{ d.created_at | dt }}</td>
                     </tr>
                 {% endfor %}
                 </table>
