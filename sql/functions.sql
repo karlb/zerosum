@@ -53,7 +53,8 @@ RETURNS TABLE (
 $$ LANGUAGE sql;
 
 
-CREATE OR REPLACE FUNCTION clear_balance(p_user_id)
+/*
+CREATE OR REPLACE FUNCTION clear_balance(p_user_id bigint)
 RETURNS bigint
 AS $$
     SELECT *
@@ -65,29 +66,19 @@ AS $$
 $$ LANGUAGE sql;
 
 
-SELECT balances((balances).user_id)
-FROM (
-    SELECT balances(user_id)
-    FROM (
-            SELECT *
-            FROM balances(1)
-            WHERE amount < 0
-        ) b1
-    WHERE amount < 0
-) b2
-WHERE (balances).amount < 0
-;
-
-
 WITH RECURSIVE possible_clearing AS (
     SELECT 0 AS iteration, 'inf'::float AS amount, ARRAY[]::bigint[] AS users,
-        starting_user_id::bigint AS last_user_id
+        1::bigint AS last_user_id, false AS has_cycle
     UNION ALL
     SELECT iteration + 1, least(c.amount, abs(b.amount)), array_append(users, b.user_id),
-           b.user_id
+           b.user_id, b.user_id = 1
     FROM possible_clearing c,
          balances(last_user_id) b
-    WHERE iteration < 3
+    WHERE iteration < 5
       AND b.amount < 0
 )
-SELECT * FROM possible_clearing;
+SELECT * FROM possible_clearing
+WHERE has_cycle
+LIMIT 1
+;
+*/
