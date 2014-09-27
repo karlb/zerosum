@@ -1,0 +1,8 @@
+{% extends "shared/base.html" %}
+
+{% block main %}
+<h3>Join now!</h3>
+    Before you can join {{ app_name }}, please verify your email address. This is necessary because your email address will be used to identify you to other users.
+
+    {{ render_form(form, action_text="Send registration mail")}}
+{% endblock %}

@@ -1,0 +1,5 @@
+Welcome to {{ app_name }}!
+--
+Hello and welcome to {{ app_name }}!
+
+To complete you registration, please go to {{ url_for('email_confirm', code=confirm_code(), _external=True) }} and fill out the registration form. Then you will be ready to add your own owes and see what other people owe you.

@@ -1,3 +1,4 @@
+\set ON_ERROR_STOP on
 DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
 --CREATE EXTENSION "uuid-ossp";
@@ -19,20 +20,29 @@ INSERT INTO zerosum_user VALUES (2, 'u2', 'u2@example.com', true, 'pbkdf2:sha1:1
 INSERT INTO zerosum_user VALUES (3, 'u3', 'u3@example.com', false, 'pbkdf2:sha1:1000$QIlMjr3h$3ce22bbce5ac3ade5406a7bd8040e01ab41cddaa');
 
 
+CREATE TABLE clearing (
+    clearing_id bigserial PRIMARY KEY,
+    created_at timestamp NOT NULL DEFAULT (now() at time zone 'utc')
+);
+
+
 CREATE TABLE owe (
     owe_id bigserial PRIMARY KEY,
     creditor_id bigint REFERENCES zerosum_user(user_id) NOT NULL,
     debitor_id bigint REFERENCES zerosum_user(user_id) NOT NULL,
     amount decimal NOT NULL CHECK (amount > 0),
     subject text,
-    created timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
-    currency text NOT NULL DEFAULT 'EUR'
+    created_at timestamp NOT NULL DEFAULT (now() at time zone 'utc'),
+    currency text NOT NULL DEFAULT 'EUR',
+    clearing_id bigint REFERENCES clearing(clearing_id)
 );
 
 INSERT INTO owe(creditor_id, debitor_id, amount, subject) VALUES 
     (1, 2, 11.40, 'Brunch'),
     (1, 2, 3.00, 'Döner'),
-    (2, 1, 5.80, 'Thanks for the Cocktail')
+    (2, 1, 5.80, 'Thanks for the Cocktail'),
+    (2, 3, 2.00, 'Beer'),
+    (3, 1, 5.50, 'Vietnamese')
 ;
 
 
