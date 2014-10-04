@@ -28,8 +28,8 @@ def index():
     return render_template('index.html')
 
 
-@login_required
 @app.route("/user/")
+@login_required
 def home():
     cur = get_db().cursor()
     cur.execute("SELECT * FROM recent_owes(%s)", [current_user.get_id()])

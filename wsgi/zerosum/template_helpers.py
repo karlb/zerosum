@@ -22,7 +22,7 @@ def format_plusminus(value):
     else:
         return ''
 
-    
+
 @app.template_filter('money')
 def format_money(value):
     return '{:.2f}'.format(value)

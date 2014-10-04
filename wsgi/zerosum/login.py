@@ -1,10 +1,10 @@
 from flask import redirect, url_for, request, render_template, flash
 from flask.ext.login import (LoginManager, login_user, logout_user,
-                             current_user)
+                             current_user, login_required)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from zerosum import app
-from zerosum.db import get_db, get_scalar
+from zerosum.db import get_db, get_scalar, get_row
 import zerosum.forms as forms
 from zerosum.mail import send_registration_mail
 
@@ -93,6 +93,7 @@ def login():
 
 
 @app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('home'))
@@ -106,12 +107,18 @@ class FormError(Exception):
 
 @app.route("/email_confirm/<string:code>", methods=['GET', 'POST'])
 def email_confirm(code):
-    email = get_scalar("""
+    email, email_exists = get_row("""
         UPDATE email_confirm
         SET opened = current_timestamp
         WHERE code = %s
-        RETURNING email
+        RETURNING email, (SELECT EXISTS (SELECT 1 FROM zerosum_user
+                                         WHERE email=email_confirm.email))
         """, [code])
+
+    if email_exists:
+        flash('A user with this email address already exists. Please log in!',
+              'warning')
+        return redirect(url_for('login'))
 
     form = forms.RegisterForm(email=email)
     form.email.kwargs = dict(readonly=True)
@@ -119,9 +126,8 @@ def email_confirm(code):
         assert form.email.data == email
         user = User(get_or_create_user(email))
         user.set_password(request.form['password'])
-        login_user(user)
         flash('Created new user!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
     else:
         return render_template('register.html', form=form)
 
