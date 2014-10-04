@@ -12,7 +12,8 @@ sg = sendgrid.SendGridClient(os.environ.get('SENDGRID_USER'),
 
 
 def send_mail(template, to, **tmpl_vars):
-    rendered_tmpl = render_template(template, **tmpl_vars)
+    rendered_tmpl = render_template(template, **tmpl_vars).strip()
+    rendered_tmpl += '\n\n' + render_template('mails/footer.txt', **tmpl_vars)
     if app.debug:
         app.logger.debug(rendered_tmpl)
         return
@@ -21,7 +22,7 @@ def send_mail(template, to, **tmpl_vars):
         to=to,
         subject=subject,
         text=body,
-        from_email='noreply@zerosum-karlb.rhcloud.com')
+        from_email='TrackMyOwe.com <noreply@trackmyowe.com>')
     sg.send(message)
 
 
