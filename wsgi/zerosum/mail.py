@@ -22,7 +22,8 @@ def send_mail(template, to, **tmpl_vars):
         to=to,
         subject=subject,
         text=body,
-        from_email='TrackMyOwe.com <noreply@trackmyowe.com>')
+        from_email='noreply@trackmyowe.com',
+        from_name='TrackMyOwe.com')
     sg.send(message)
 
 
