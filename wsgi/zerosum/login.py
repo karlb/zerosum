@@ -50,6 +50,9 @@ class User:
     def is_authenticated(self):
         return True
 
+    def is_anonymous(self):
+        return False
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -96,7 +99,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('index'))
 
 
 class FormError(Exception):
