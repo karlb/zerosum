@@ -130,7 +130,8 @@ def email_confirm(code):
         user = User(get_or_create_user(email))
         user.set_password(request.form['password'])
         flash('Created new user!', 'success')
-        return redirect(url_for('index'))
+        login_user(user)
+        return redirect(url_for('home'))
     else:
         return render_template('register.html', form=form)
 
