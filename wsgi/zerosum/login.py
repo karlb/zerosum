@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from zerosum import app
 from zerosum.db import get_db, get_scalar, get_row
+import zerosum.db as db
 import zerosum.forms as forms
 from zerosum.mail import send_registration_mail
 
@@ -86,12 +87,17 @@ def login():
         login = request.form['login']
         password = request.form['password']
         # get user
-        cur = get_db().cursor()
-        cur.execute("SELECT * FROM zerosum_user WHERE email = %s", [login])
-        user = User(cur.fetchall()[0])
-        if user.check_password(password):
-            login_user(user)
-            return redirect(url_for('home'))
+        try:
+            db_user = db.get_row("SELECT * FROM zerosum_user WHERE email = %s",
+                                 [login])
+            user = User(db_user)
+            if user.check_password(password):
+                login_user(user)
+                return redirect(url_for('home'))
+        except db.NoResult:
+            pass
+        flash('Email/password do not match or no user with this email exists',
+              'error')
     return render_template('login.html')
 
 

@@ -7,6 +7,9 @@ from flask import g
 from zerosum import app
 
 
+class NoResult(Exception): pass
+
+
 def get_db():
     """Opens a new database connection if there is none yet for the
     current application context.
@@ -37,6 +40,8 @@ def get_row(query, params):
     cur = get_db().cursor()
     cur.execute(query, params)
     rows = cur.fetchall()
+    if len(rows) < 1:
+        raise NoResult
     assert len(rows) == 1
     return rows[0]
 
