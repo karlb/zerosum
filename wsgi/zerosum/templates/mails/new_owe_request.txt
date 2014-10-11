@@ -1,0 +1,15 @@
+Do you owe {{ creditor_name }}?
+--
+Hi {{ debitor_name }}!
+
+{{ creditor_name }} says that you owe him/her {{ amount }} {{ currency }} for "{{ subject }}". Is this correct?
+
+{% if is_active -%}
+Please go to your {{ app_name }} account and confirm or deny this owe:
+
+{{ url_for('home', _external=True) }}
+{%- else -%}
+This information is stored on {{ app_name }}, an online owe tracking service. Go to
+{{ url_for('email_confirm', code=confirm_code(), _external=True) }}
+to claim your account and confirm or deny this owe.
+{%- endif %}

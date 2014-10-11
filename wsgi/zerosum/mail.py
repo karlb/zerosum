@@ -47,7 +47,25 @@ def send_owe_mail(owe_id):
             WHERE owe_id = %s
         """, [owe_id])
     send_mail('mails/new_owe.txt', owe.creditor_email,
-            confirm_code=lambda: confirm_code(owe.creditor_email), **owe._asdict())
+              confirm_code=lambda: confirm_code(owe.creditor_email),
+              **owe._asdict())
+
+
+def send_owe_request_mail(owe_request_id):
+    owe_req = get_row("""
+            SELECT owe_request.*,
+                  creditor.name AS creditor_name,
+                  debitor.is_active,
+                  debitor.name AS debitor_name,
+                  debitor.email AS debitor_email
+            FROM owe_request
+                JOIN zerosum_user creditor ON (creditor_id = creditor.user_id)
+                JOIN zerosum_user debitor ON (debitor_id = debitor.user_id)
+            WHERE owe_request_id = %s
+        """, [owe_request_id])
+    send_mail('mails/new_owe_request.txt', owe_req.debitor_email,
+              confirm_code=lambda: confirm_code(owe_req.debitor_email),
+              **owe_req._asdict())
 
 
 def send_registration_mail(email):

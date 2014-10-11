@@ -6,12 +6,9 @@ Hi {{ creditor_name }}!
 
 {% if is_active -%}
 Have a look at your {{ app_name }} account to see the details:
-
 {{ url_for('home', _external=True) }}
 {%- else -%}
 This information is stored on {{ app_name }}, an online owe tracking service. Go to
-
 {{ url_for('email_confirm', code=confirm_code(), _external=True) }}
-
 to claim your account, see all details about your owes and create new ones.
 {%- endif %}

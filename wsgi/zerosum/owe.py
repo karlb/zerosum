@@ -4,7 +4,7 @@ from flask.ext.login import login_required, current_user
 from zerosum import app
 from zerosum.login import get_or_create_user
 from zerosum.db import get_db, get_scalar, get_all, get_row
-from zerosum.mail import send_owe_mail
+from zerosum.mail import send_owe_mail, send_owe_request_mail
 import zerosum.forms as forms
 import zerosum.db as db
 
@@ -36,19 +36,19 @@ def request_owe():
     form.debitor.kwargs = dict(autofocus=True)
     if form.validate_on_submit():
         debitor_id = get_or_create_user(form.debitor.data).user_id
-        owe_id = get_scalar("""
+        owe_request_id = get_scalar("""
                 INSERT INTO owe_request(creditor_id, debitor_id, amount, subject)
                 VALUES (%s, %s, %s, %s)
                 RETURNING owe_request_id
             """, [current_user.get_id(), debitor_id,
                   form.amount.data, form.subject.data])
-        #send_owe_request_mail(owe_request_id)
+        send_owe_request_mail(owe_request_id)
         flash('Owe request sent successfully!', 'success')
         return redirect(url_for('home'))
     else:
         return render_template('request_owe.html', form=form)
 
-    
+
 @login_required
 @app.route("/respond_to_request", methods=['POST'])
 def respond_to_request():
