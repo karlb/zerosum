@@ -28,12 +28,20 @@ class EmailWithName(Email):
 
 
 class NewOweForm(Form):
-    creditor = StringField('I owe to', validators=[DataRequired(), Email()])
-    amount = DecimalField('Amount', validators=[DataRequired()])
-    subject = StringField('Subject')
+    creditor = StringField('I owe to', validators=[DataRequired(), Email()],
+                           description={'placeholder': 'Email address',
+                                        'autofocus': True})
+    amount = DecimalField('Amount', validators=[DataRequired()],
+                          description={'placeholder': 'Owe amount in EUR'})
+    subject = StringField('Subject',
+                          description={'placeholder': 'Why do you owe money? (keep this short)'})
 
 
 class RequestOweForm(Form):
-    debitor = StringField('Who owes me?', validators=[DataRequired(), Email()])
-    amount = DecimalField('Amount', validators=[DataRequired()])
-    subject = StringField('Subject')
+    debitor = StringField('Who owes me?', validators=[DataRequired(), Email()],
+                           description={'placeholder': 'Email address',
+                                        'autofocus': True})
+    amount = DecimalField('Amount', validators=[DataRequired()],
+                          description={'placeholder': 'Owe amount in EUR'})
+    subject = StringField('Subject',
+                          description={'placeholder': 'Why does he/she owe money? (keep this short)'})

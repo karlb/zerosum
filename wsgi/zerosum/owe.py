@@ -13,7 +13,6 @@ import zerosum.db as db
 @app.route("/new_owe", methods=['GET', 'POST'])
 def new_owe():
     form = forms.NewOweForm()
-    form.creditor.kwargs = dict(autofocus=True)
     if form.validate_on_submit():
         creditor_id = get_or_create_user(form.creditor.data).user_id
         owe_id = get_scalar("""
@@ -33,7 +32,6 @@ def new_owe():
 @app.route("/request_owe", methods=['GET', 'POST'])
 def request_owe():
     form = forms.RequestOweForm()
-    form.debitor.kwargs = dict(autofocus=True)
     if form.validate_on_submit():
         debitor_id = get_or_create_user(form.debitor.data).user_id
         owe_request_id = get_scalar("""

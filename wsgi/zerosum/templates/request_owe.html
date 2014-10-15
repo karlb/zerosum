@@ -2,5 +2,10 @@
 
 {% block main %}
 <h2>Request Owe</h2>
+
+<p class="text-muted">
+    When you send an owe request, the debitor will receive an email asking him to confirm the owe. Only then will the owe appear in your owe balance.
+</p>
+
 {{ render_form(form, action_text="Send Owe Request") }}
 {% endblock %}

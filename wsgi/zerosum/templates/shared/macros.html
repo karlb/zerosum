@@ -26,7 +26,7 @@
                 {% elif f.type == 'RadioField' %}
                     {{ render_radio_field(f) }}
                 {% else %}
-                    {{ render_field(f, **(f.kwargs or {})) }}
+                    {{ render_field(f, **(f.description or {})) }}
                 {% endif %}
             {% endfor %}
         {% endif %}
