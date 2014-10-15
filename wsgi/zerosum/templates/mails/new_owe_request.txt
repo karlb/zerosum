@@ -6,7 +6,6 @@ Hi {{ debitor_name }}!
 
 {% if is_active -%}
 Please go to your {{ app_name }} account and confirm or deny this owe:
-
 {{ url_for('home', _external=True) }}
 {%- else -%}
 This information is stored on {{ app_name }}, an online owe tracking service. Go to
