@@ -121,7 +121,8 @@ def email_confirm(code):
         SET opened = current_timestamp
         WHERE code = %s
         RETURNING email, (SELECT EXISTS (SELECT 1 FROM zerosum_user
-                                         WHERE email=email_confirm.email))
+                                         WHERE email=email_confirm.email
+                                           AND is_active))
         """, [code])
 
     if email_exists:
