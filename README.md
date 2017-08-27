@@ -1,39 +1,26 @@
-Flask on OpenShift
-==================
+# Track My Owe / zerosum
 
-This git repository helps you get up and running quickly w/ a Flask installation
-on OpenShift.
+![Public description page](screenshots/screenshot1.png)
+![User's overview page](screenshots/screenshot2.png)
 
+Track My Owe (referred to zerosum in the code) is a platform with the following goals:
 
-Running on OpenShift
-----------------------------
+1. Track money owed to/by other people
+2. Let the other people know about that fact (and allow them to look it up later)
+3. Condense multiple owes between people into a single balance
 
-Create an account at https://www.openshift.com
+# Thoughts behind Track My Owe
 
-Create a python application
+There are many occasions when people borrow money between each other (e.g. coworkers, a flatshare or a group vacation). It is an unnecessary hassle to resolve every single amount separately. If you trust the other party, you can wait until the owes are either canceled out by owes flowing in the opposite direction or until you want settle the outstanding balance explicitly. This can even work properly across multiple borrowers/lenders. To avoid people registering false owes, the one owing money has to confirm an entry unless he created it himself.
+In a way, you can see this as real money transaction system. After all, we are used to treat balances as real money as soon as there is a concesus about the balance between both involved parties.
 
-    rhc app create flask python-2.6
+# Current Status
 
-Add this upstream flask repo
+Development has stopped and probably won't resume. I still think the concept is interesting, but it's probably not easy to make a popular product out of this.
 
-    cd flask
-    git remote add upstream -m master https://github.com/openshift/flask-example.git
-    git pull -s recursive -X theirs upstream master
-    
-Then push the repo upstream
+Since Red Hat shut down OpenShift v2, there's no running instance of this, anymore.
 
-    git push
+# Contact:
 
-That's it, you can now checkout your application at:
-
-    http://flask-$yournamespace.rhcloud.com
-
-------------------------------
-
-To get more log messages in your OpenShift logs please add the following line to your code
-
-    app.config['PROPAGATE_EXCEPTIONS'] = True
-
-To read more about logging in Flask please see this email
-
-http://librelist.com/browser//flask/2012/1/27/catching-exceptions-from-flask/
+Karl Bartel
+karl42@gmail.com
