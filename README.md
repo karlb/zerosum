@@ -1,7 +1,7 @@
 # Track My Owe / zerosum
 
-![Public description page](screenshots/screenshot1.png | width=300)
-![User's overview page](screenshots/screenshot2.png | width=300)
+![Public description page](screenshots/screenshot1.png)
+![User's overview page](screenshots/screenshot2.png)
 
 Track My Owe (referred to zerosum in the code) is a platform with the following goals:
 
