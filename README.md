@@ -1,7 +1,7 @@
 # Track My Owe / zerosum
 
-![Public description page](screenshots/screenshot1.png)
-![User's overview page](screenshots/screenshot2.png)
+![Public description page](screenshots/screenshot1.png | width=300)
+![User's overview page](screenshots/screenshot2.png | width=300)
 
 Track My Owe (referred to zerosum in the code) is a platform with the following goals:
 
@@ -12,6 +12,7 @@ Track My Owe (referred to zerosum in the code) is a platform with the following 
 # Thoughts behind Track My Owe
 
 There are many occasions when people borrow money between each other (e.g. coworkers, a flatshare or a group vacation). It is an unnecessary hassle to resolve every single amount separately. If you trust the other party, you can wait until the owes are either canceled out by owes flowing in the opposite direction or until you want settle the outstanding balance explicitly. This can even work properly across multiple borrowers/lenders. To avoid people registering false owes, the one owing money has to confirm an entry unless he created it himself.
+
 In a way, you can see this as real money transaction system. After all, we are used to treat balances as real money as soon as there is a concesus about the balance between both involved parties.
 
 # Current Status
